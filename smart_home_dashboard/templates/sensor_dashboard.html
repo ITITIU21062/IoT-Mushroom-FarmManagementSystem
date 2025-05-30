@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Sensor Data</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body>
+  <div class="container mt-4">
+    <h2>Sensor Readings</h2>
+    <table class="table table-striped" id="sensor-table">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Sensor Type</th>
+          <th>Value 1</th>
+          <th>Unit 1</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody id="sensor-table-body">
+        <!-- dữ liệu sẽ được nạp tự động -->
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Sensor Readings Section -->
+  <div class="card mt-4">
+    <div class="card-header bg-success text-white">
+      <h5 class="mb-0">Sensor Readings</h5>
+    </div>
+    <div class="card-body" id="sensors-container">
+      <div class="text-center">
+        <div class="spinner-border" role="status"></div>
+        <p>Loading sensor readings...</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+  <!-- Sensor Cards -->
+  <div class="col-md-6">
+    <div id="sensors-container" class="d-flex flex-column gap-3"></div>
+  </div>
+
+  <!-- Summary & Advice -->
+  <div class="col-md-6">
+    <div id="sensor-summary" class="d-flex flex-column gap-3"></div>
+  </div>
+</div>
+
+
+
+  <!-- Chọn cảm biến và thời gian 
+  <div class="mb-3">
+    <label for="sensorSelect">Sensor:</label>
+    <select id="sensorSelect" class="form-select"></select>
+
+    <label class="mt-2">From:</label>
+    <input type="datetime-local" id="startTime" class="form-control" />
+
+    <label class="mt-2">To:</label>
+    <input type="datetime-local" id="endTime" class="form-control" />
+
+    <button class="btn btn-primary mt-2" onclick="loadSensorHistory()">View History</button>
+  </div>
+
+ Biểu đồ 
+<canvas id="historyChart" height="100"></canvas> -->
+
+
+  <script>
+    async function loadSensorData() {
+      const res = await fetch('/api/sensor-readings');
+      const data = await res.json();
+
+      if (data.success) {
+        const tbody = document.getElementById('sensor-table-body');
+        tbody.innerHTML = '';
+
+        data.readings.forEach(r => {
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>${r.id}</td>
+            <td>${r.sensor_type}</td>
+            <td>${r.value1 ?? ''}</td>
+            <td>${r.unit1 ?? ''}</td>
+            <td>${r.timestamp}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+    }
+
+    loadSensorData();
+    setInterval(loadSensorData, 10000); // cập nhật mỗi 10 giây
+  </script>
+  <script src="{{ url_for('static', filename='js/user/sensorDisplay.js') }}"></script>
+
+</body>
+</html>
